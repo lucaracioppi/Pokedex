@@ -30,23 +30,39 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [pokemon, setPokemon] = useState([]);
   const [selectedPokemon, setSelectedPokemon] = useState();
-  const [currentPage, setCurrentPage] = useState(
-    "https://pokeapi.co/api/v2/pokemon/?limit=20&offset=0"
-  );
+  const [totalPokemon, setTotalPokemon] = useState(0);
+  const [offset, setOffset] = useState(0);
+  const [isLoadMore, setIsLoadMore] = useState(true);
 
   useEffect(() => {
     setIsLoading(true);
-    axios.get(currentPage).then(async ({ data }) => {
-      const promises = data.results.map((result) => axios(result.url));
-      const fetchedPokemon = (await Promise.all(promises)).map(
-        (res) => res.data
-      );
-      setPokemon((prev) => [...prev, ...fetchedPokemon]);
-      setIsLoading(false);
-    });
-  }, [currentPage]);
+    axios
+      .get(`https://pokeapi.co/api/v2/pokemon/?limit=20&offset=${offset}`)
+      .then(async ({ data }) => {
+        const promises = data.results.map((result) => axios(result.url));
+        const fetchedPokemon = (await Promise.all(promises)).map(
+          (res) => res.data
+        );
+        setPokemon(fetchedPokemon);
+        setIsLoading(false);
+        setTotalPokemon(data.count);
+      });
+  }, [offset]);
 
-  function handleNextPage() {}
+  // Paginación
+  function handleNextPage() {
+    if (totalPokemon - offset > 20) {
+      setOffset(offset + 20);
+      setIsLoadMore(true);
+    }
+  }
+
+  function handlePreviousPage() {
+    if (offset >= 20) {
+      setOffset(offset - 20);
+      setIsLoadMore(false);
+    }
+  }
 
   function handleViewPokemon(pokemon) {
     setSelectedPokemon(pokemon);
@@ -75,10 +91,28 @@ export default function Home() {
                 </Box>
               ))}
             </SimpleGrid>
-
-            <Button isLoading={false} onClick={handleNextPage}>
-              Cargas más
-            </Button>
+            <Stack direction="row">
+              <Button
+                display={offset < 20 ? "none" : "flex"}
+                isLoading={isLoading && !isLoadMore}
+                onClick={handlePreviousPage}
+                loadingText="Cargando..."
+                colorScheme="teal"
+                variant="outline"
+              >
+                Ver anteriores
+              </Button>
+              <Button
+                display={totalPokemon - offset > 20 ? "flex" : "none"}
+                isLoading={isLoading && isLoadMore}
+                onClick={handleNextPage}
+                loadingText="Cargando..."
+                colorScheme="teal"
+                variant="outline"
+              >
+                Cargas más
+              </Button>
+            </Stack>
           </Stack>
         </Container>
       </Flex>
