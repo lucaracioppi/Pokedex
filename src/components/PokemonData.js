@@ -22,11 +22,45 @@ import { useEffect, useState } from "react";
 export default function PokemonData({ pokemon }) {
   const [catched, setCatched] = useState(false);
 
+  useEffect(() => {
+    // Consulta a la API si el Pokemon esta capturado
+    const fetchCatchedStatus = async () => {
+      try {
+        const response = await axios.get(`/api/catched`);
+        setCatched(response.data.some((p) => p.id === pokemon.id));
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+    fetchCatchedStatus();
+  }, [pokemon.id]);
+
+  const handleCheckboxChange = async (event) => {
+    const isChecked = event.target.checked;
+    setCatched(isChecked);
+    try {
+      if (isChecked) {
+        // Captura el Pokémon
+        await axios.post("/api/catched", {
+          id: pokemon.id,
+          name: pokemon.name,
+        });
+      } else {
+        // Libera el Pokémon
+        await axios.delete(`/api/catched/${pokemon.id}`);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   return (
     <Stack spacing="5" pb="5">
       <Stack spacing="5" position="relative">
         <Box position="absolute" right="0" zIndex="99">
-          <Checkbox>Catched</Checkbox>
+          <Checkbox isChecked={catched} onChange={handleCheckboxChange}>
+            Catched
+          </Checkbox>
         </Box>
         <AspectRatio w="full" ratio={1}>
           <Image
@@ -34,18 +68,36 @@ export default function PokemonData({ pokemon }) {
             src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemon.id}.png`}
           />
         </AspectRatio>
-        <Stack direction="row" spacing="5">
-          <Stack>
-            <Text fontSize="sm">Weight</Text>
-            <Text>20</Text>
-          </Stack>
-          <Stack>
-            <Text fontSize="sm">Height</Text>
-            <Text>12</Text>
-          </Stack>
-          <Stack>
-            <Text fontSize="sm">Movimientos</Text>
-            <Text>109</Text>
+        <Stack direction="row" justifyContent="space-around">
+          <Stack direction="row" bg="gray.100" p="3" borderRadius="md">
+            <Stack
+              pr="2"
+              alignItems="center"
+              borderRightWidth="1px"
+              borderRightColor="gray.300"
+            >
+              <Text fontSize="sm" fontWeight="bold">
+                Weight
+              </Text>
+              <Text>20</Text>
+            </Stack>
+            <Stack
+              pr="2"
+              alignItems="center"
+              borderRightWidth="1px"
+              borderRightColor="gray.300"
+            >
+              <Text fontSize="sm" fontWeight="bold">
+                Height
+              </Text>
+              <Text>12</Text>
+            </Stack>
+            <Stack alignItems="center">
+              <Text fontSize="sm" fontWeight="bold">
+                Movimientos
+              </Text>
+              <Text>109</Text>
+            </Stack>
           </Stack>
           <Stack>
             <Text fontSize="sm">Tipos</Text>
