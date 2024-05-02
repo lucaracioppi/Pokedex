@@ -10,6 +10,11 @@ export default async function handler(req, res) {
     const newPokemon = {
       id: req.body.id,
       name: req.body.name,
+      types: req.body.types,
+      weight: req.body.weight,
+      height: req.body.height,
+      moves: req.body.moves,
+      stats: req.body.stats,
     };
 
     const index = await db.getIndex("/catchedPokemon", Number(newPokemon.id));

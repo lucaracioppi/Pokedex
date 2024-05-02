@@ -44,6 +44,11 @@ export default function PokemonData({ pokemon }) {
         await axios.post("/api/catched", {
           id: pokemon.id,
           name: pokemon.name,
+          types: pokemon.types,
+          weight: pokemon.weight,
+          height: pokemon.height,
+          moves: pokemon.moves,
+          stats: pokemon.stats,
         });
       } else {
         // Libera el Pokémon
@@ -94,13 +99,13 @@ export default function PokemonData({ pokemon }) {
             </Stack>
             <Stack alignItems="center">
               <Text fontSize="sm" fontWeight="bold">
-                Movimientos
+                Movements
               </Text>
               <Text>{pokemon.moves.length}</Text>
             </Stack>
           </Stack>
           <Stack>
-            <Text fontSize="sm">Tipos</Text>
+            <Text fontSize="sm">Types</Text>
             <HStack>
               {pokemon.types.map((type, index) => (
                 <Badge key={index}>{type.type.name}</Badge>

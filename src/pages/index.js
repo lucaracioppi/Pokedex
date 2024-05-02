@@ -9,6 +9,10 @@ import {
   Container,
   Stack,
   Input,
+  Checkbox,
+  Text,
+  List,
+  ListItem,
   Button,
   SimpleGrid,
   Flex,
@@ -21,6 +25,7 @@ import {
   ModalCloseButton,
   useDisclosure,
 } from "@chakra-ui/react";
+import Navbar from "@/components/Navbar";
 import PokemonCard from "@/components/PokemonCard";
 import PokemonData from "@/components/PokemonData";
 
@@ -33,32 +38,61 @@ export default function Home() {
   const [totalPokemon, setTotalPokemon] = useState(0);
   const [offset, setOffset] = useState(0);
   const [isLoadMore, setIsLoadMore] = useState(true);
+  const [checkAll, setCheckAll] = useState(true);
+  const [checkCatched, setCheckCatched] = useState(false);
 
   useEffect(() => {
-    setIsLoading(true);
-    axios
-      .get(`https://pokeapi.co/api/v2/pokemon/?limit=20&offset=${offset}`)
-      .then(async ({ data }) => {
-        const promises = data.results.map((result) => axios(result.url));
-        const fetchedPokemon = (await Promise.all(promises)).map(
-          (res) => res.data
-        );
-        setPokemon(fetchedPokemon);
-        setIsLoading(false);
-        setTotalPokemon(data.count);
-      });
+    fetchPokemon(offset);
   }, [offset]);
+
+  // Función para obtener los Pokémon desde la API
+  const fetchPokemon = async (offset) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon/?limit=20&offset=${offset}`
+      );
+      const promises = response.data.results.map((result) => axios(result.url));
+      const fetchedPokemon = (await Promise.all(promises)).map(
+        (res) => res.data
+      );
+      setPokemon(fetchedPokemon);
+      setTotalPokemon(response.data.count);
+    } catch (error) {
+      console.error("Error fetching Pokémon:", error);
+    }
+    setIsLoading(false);
+  };
+
+  function getCatched(filter) {
+    setIsLoading(true);
+
+    if (checkCatched || filter === "catched") {
+      const fetchCatched = async () => {
+        try {
+          const response = await axios.get(`/api/catched`);
+          setPokemon(response.data);
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      };
+      fetchCatched();
+    } else {
+      fetchPokemon(offset);
+    }
+    setIsLoading(false);
+  }
 
   // Paginación
   function handleNextPage() {
-    if (totalPokemon - offset > 20) {
+    if (totalPokemon - offset > 20 && checkAll) {
       setOffset(offset + 20);
       setIsLoadMore(true);
     }
   }
 
   function handlePreviousPage() {
-    if (offset >= 20) {
+    if (offset >= 20 && checkAll) {
       setOffset(offset - 20);
       setIsLoadMore(false);
     }
@@ -69,6 +103,18 @@ export default function Home() {
     pokemonDataModal.onOpen();
   }
 
+  function handleFilterChange(filter) {
+    if (filter === "catched") {
+      setCheckCatched(true);
+      setCheckAll(false);
+      getCatched(filter);
+    } else {
+      setCheckAll(true);
+      setCheckCatched(false);
+      fetchPokemon(offset);
+    }
+  }
+
   return (
     <>
       <Head>
@@ -77,8 +123,23 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Flex alignItems="center" minH="100vh" justifyContent="center">
+      <Navbar />
+      <Flex minH="100vh" justifyContent="center">
         <Container maxW="container.lg">
+          <Stack direction="row" pt="7" px="16" spacing="8">
+            <Checkbox
+              isChecked={checkAll}
+              onChange={() => handleFilterChange("all")}
+            >
+              All Pokemons
+            </Checkbox>
+            <Checkbox
+              isChecked={checkCatched}
+              onChange={() => handleFilterChange("catched")}
+            >
+              Catched Pokemons
+            </Checkbox>
+          </Stack>
           <Stack p="5" alignItems="center" spacing="5">
             <SimpleGrid spacing="5" columns={{ base: 1, md: 5 }}>
               {pokemon.map((pokemon) => (
@@ -91,7 +152,7 @@ export default function Home() {
                 </Box>
               ))}
             </SimpleGrid>
-            <Stack direction="row">
+            <Stack display={checkAll ? "flex" : "none"} direction="row">
               <Button
                 display={offset < 20 ? "none" : "flex"}
                 isLoading={isLoading && !isLoadMore}
@@ -113,10 +174,15 @@ export default function Home() {
                 Cargas más
               </Button>
             </Stack>
+            <Stack
+              display={checkCatched && pokemon.length === 0 ? "flex" : "none"}
+            >
+              <Text>No hay pokemones capturados</Text>
+            </Stack>
           </Stack>
         </Container>
       </Flex>
-      <Modal {...pokemonDataModal}>
+      <Modal {...pokemonDataModal} onCloseComplete={getCatched}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader textTransform="capitalize">
