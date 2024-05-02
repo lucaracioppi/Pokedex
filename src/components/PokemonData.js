@@ -79,7 +79,7 @@ export default function PokemonData({ pokemon }) {
               <Text fontSize="sm" fontWeight="bold">
                 Weight
               </Text>
-              <Text>20</Text>
+              <Text>{pokemon.weight}</Text>
             </Stack>
             <Stack
               pr="2"
@@ -90,20 +90,21 @@ export default function PokemonData({ pokemon }) {
               <Text fontSize="sm" fontWeight="bold">
                 Height
               </Text>
-              <Text>12</Text>
+              <Text>{pokemon.height}</Text>
             </Stack>
             <Stack alignItems="center">
               <Text fontSize="sm" fontWeight="bold">
                 Movimientos
               </Text>
-              <Text>109</Text>
+              <Text>{pokemon.moves.length}</Text>
             </Stack>
           </Stack>
           <Stack>
             <Text fontSize="sm">Tipos</Text>
             <HStack>
-              <Badge>Agua</Badge>
-              <Badge>Agua</Badge>
+              {pokemon.types.map((type, index) => (
+                <Badge key={index}>{type.type.name}</Badge>
+              ))}
             </HStack>
           </Stack>
         </Stack>
@@ -112,11 +113,27 @@ export default function PokemonData({ pokemon }) {
       <Stack spacing="5" p="5" bg="gray.100" borderRadius="xl">
         <Stack>
           <Text fontSize="xs">hp</Text>
-          <Progress bg="gray.300" borderRadius="full" value={80} />
+          <Progress
+            bg="gray.300"
+            borderRadius="full"
+            value={pokemon.stats[0].base_stat}
+          />
         </Stack>
         <Stack>
           <Text fontSize="xs">attack</Text>
-          <Progress bg="gray.300" borderRadius="full" value={65} />
+          <Progress
+            bg="gray.300"
+            borderRadius="full"
+            value={pokemon.stats[1].base_stat}
+          />
+        </Stack>
+        <Stack>
+          <Text fontSize="xs">defense</Text>
+          <Progress
+            bg="gray.300"
+            borderRadius="full"
+            value={pokemon.stats[2].base_stat}
+          />
         </Stack>
       </Stack>
     </Stack>
