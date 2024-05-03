@@ -8,25 +8,20 @@ import { useEffect, useState } from "react";
 import {
   Container,
   Stack,
-  Input,
   Checkbox,
   Text,
   Image,
-  List,
-  ListItem,
   Button,
   SimpleGrid,
   Flex,
   Box,
   Modal,
   ModalOverlay,
-  ModalHeader,
   ModalBody,
   ModalContent,
   ModalCloseButton,
   useDisclosure,
 } from "@chakra-ui/react";
-import Navbar from "@/components/Navbar";
 import PokemonCard from "@/components/PokemonCard";
 import PokemonData from "@/components/PokemonData";
 
@@ -86,6 +81,7 @@ export default function Home() {
     setIsLoading(false);
   };
 
+  // Función para obtener los Pokemón capturados
   function getCatched(filter) {
     setIsLoading(true);
 
@@ -125,6 +121,7 @@ export default function Home() {
     pokemonDataModal.onOpen();
   }
 
+  // Filtro
   function handleFilterChange(filter) {
     if (filter === "catched") {
       setCheckCatched(true);
