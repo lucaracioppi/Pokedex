@@ -11,6 +11,7 @@ import {
   Input,
   Checkbox,
   Text,
+  Image,
   List,
   ListItem,
   Button,
@@ -31,6 +32,27 @@ import PokemonData from "@/components/PokemonData";
 
 export default function Home() {
   const pokemonDataModal = useDisclosure();
+
+  const typeColors = {
+    normal: "gray",
+    fire: "red",
+    water: "blue",
+    electric: "yellow",
+    grass: "green",
+    ice: "cyan",
+    fighting: "orange",
+    poison: "purple",
+    ground: "green",
+    flying: "teal",
+    psychic: "pink",
+    bug: "yellow",
+    rock: "gray",
+    ghost: "pink",
+    dragon: "teal",
+    dark: "blue",
+    steel: "gray",
+    fairy: "teal",
+  };
 
   const [isLoading, setIsLoading] = useState(false);
   const [pokemon, setPokemon] = useState([]);
@@ -123,10 +145,25 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar />
-      <Flex minH="100vh" justifyContent="center">
-        <Container maxW="container.lg">
-          <Stack direction="row" pt="7" px="16" spacing="8">
+      <Stack
+        pt={"10"}
+        py="5"
+        width={"100%"}
+        shadow={"sm"}
+        justifyContent="center"
+        alignItems="center"
+        position="fixed"
+        top="16"
+        zIndex={10}
+        left="50%"
+        transform="translate(-50%, -50%)"
+        bgColor="white"
+      >
+        <Image src="/images/pokemon.png" alt="Pokemon" width={300} />
+      </Stack>
+      <Flex minH="100vh" justifyContent="center" mt={"36"}>
+        <Container maxW="container.xl">
+          <Stack direction="row" pt="7" justifyContent="center" spacing="8">
             <Checkbox
               isChecked={checkAll}
               onChange={() => handleFilterChange("all")}
@@ -140,19 +177,25 @@ export default function Home() {
               Catched Pokemons
             </Checkbox>
           </Stack>
-          <Stack p="5" alignItems="center" spacing="5">
-            <SimpleGrid spacing="5" columns={{ base: 1, md: 5 }}>
+          <Stack p="5" mt={"8"} alignItems="center" spacing="5">
+            <SimpleGrid spacing="5" columns={{ base: 1, sm: 2, md: 4, lg: 5 }}>
               {pokemon.map((pokemon) => (
                 <Box
+                  justifyContent={"center"}
                   as="button"
                   key={pokemon.id}
                   onClick={() => handleViewPokemon(pokemon)}
                 >
-                  <PokemonCard pokemon={pokemon} />
+                  <PokemonCard typeColors={typeColors} pokemon={pokemon} />
                 </Box>
               ))}
             </SimpleGrid>
-            <Stack display={checkAll ? "flex" : "none"} direction="row">
+            <Stack
+              display={checkAll ? "flex" : "none"}
+              direction="row"
+              spacing="5"
+              mt={"6"}
+            >
               <Button
                 display={offset < 20 ? "none" : "flex"}
                 isLoading={isLoading && !isLoadMore}
@@ -160,6 +203,7 @@ export default function Home() {
                 loadingText="Cargando..."
                 colorScheme="teal"
                 variant="outline"
+                width={130}
               >
                 Ver anteriores
               </Button>
@@ -170,14 +214,31 @@ export default function Home() {
                 loadingText="Cargando..."
                 colorScheme="teal"
                 variant="outline"
+                width={130}
               >
                 Cargas más
               </Button>
             </Stack>
             <Stack
               display={checkCatched && pokemon.length === 0 ? "flex" : "none"}
+              width={{ base: 300, md: 500 }}
+              height={{ base: 150, md: 200 }}
+              bgColor={"gray.100"}
+              color={"blue.300"}
+              justifyContent="center"
+              alignItems="center"
+              borderRadius={"xl"}
+              shadow={"sm"}
             >
-              <Text>No hay pokemones capturados</Text>
+              <Text
+                fontWeight={"bold"}
+                fontSize={{ base: "xl", md: "3xl" }}
+                as="b"
+                px={{ base: "3", md: "5" }}
+                textAlign={"center"}
+              >
+                No hay pokemones capturados ¡Sal a capturarlos!
+              </Text>
             </Stack>
           </Stack>
         </Container>
@@ -185,12 +246,11 @@ export default function Home() {
       <Modal {...pokemonDataModal} onCloseComplete={getCatched}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader textTransform="capitalize">
-            {selectedPokemon?.name}
-          </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {selectedPokemon && <PokemonData pokemon={selectedPokemon} />}
+            {selectedPokemon && (
+              <PokemonData typeColors={typeColors} pokemon={selectedPokemon} />
+            )}
           </ModalBody>
         </ModalContent>
       </Modal>

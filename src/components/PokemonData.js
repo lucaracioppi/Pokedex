@@ -19,7 +19,7 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-export default function PokemonData({ pokemon }) {
+export default function PokemonData({ pokemon, typeColors }) {
   const [catched, setCatched] = useState(false);
 
   useEffect(() => {
@@ -62,17 +62,46 @@ export default function PokemonData({ pokemon }) {
   return (
     <Stack spacing="5" pb="5">
       <Stack spacing="5" position="relative">
-        <Box position="absolute" right="0" zIndex="99">
-          <Checkbox isChecked={catched} onChange={handleCheckboxChange}>
+        <Box position="absolute" left="0" mt={"2"} zIndex="99">
+          <Checkbox
+            isChecked={catched}
+            onChange={handleCheckboxChange}
+            colorScheme={"green"}
+            size={"lg"}
+          >
             Catched
           </Checkbox>
         </Box>
-        <AspectRatio w="full" ratio={1}>
+
+        <AspectRatio w="full" ratio={1} mt={"5"} mb={"2"}>
           <Image
             objectFit="contain"
             src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemon.id}.png`}
           />
         </AspectRatio>
+        <Stack direction="row" justifyContent="center" mt={"-8"}>
+          <Text
+            textTransform={"capitalize"}
+            fontWeight="semibold"
+            fontSize={"3xl"}
+            textAlign="center"
+            as={"b"}
+            borderRight={"1px"}
+            borderColor={"gray.300"}
+            pr={"2"}
+          >
+            #{pokemon.id}
+          </Text>
+          <Text
+            textTransform={"capitalize"}
+            fontWeight="semibold"
+            fontSize={"3xl"}
+            textAlign="center"
+            as={"b"}
+          >
+            {pokemon.name}
+          </Text>
+        </Stack>
         <Stack direction="row" justifyContent="space-around">
           <Stack direction="row" bg="gray.100" p="3" borderRadius="md">
             <Stack
@@ -81,7 +110,7 @@ export default function PokemonData({ pokemon }) {
               borderRightWidth="1px"
               borderRightColor="gray.300"
             >
-              <Text fontSize="sm" fontWeight="bold">
+              <Text fontSize="sm" fontWeight="semibold">
                 Weight
               </Text>
               <Text>{pokemon.weight}</Text>
@@ -92,51 +121,61 @@ export default function PokemonData({ pokemon }) {
               borderRightWidth="1px"
               borderRightColor="gray.300"
             >
-              <Text fontSize="sm" fontWeight="bold">
+              <Text fontSize="sm" fontWeight="semibold">
                 Height
               </Text>
               <Text>{pokemon.height}</Text>
             </Stack>
             <Stack alignItems="center">
-              <Text fontSize="sm" fontWeight="bold">
+              <Text fontSize="sm" fontWeight="semibold">
                 Movements
               </Text>
               <Text>{pokemon.moves.length}</Text>
             </Stack>
           </Stack>
-          <Stack>
-            <Text fontSize="sm">Types</Text>
+          <Stack bg="gray.100" p="3" borderRadius="md" alignItems={"center"}>
+            <Text fontSize="sm" fontWeight="semibold">
+              Types
+            </Text>
             <HStack>
               {pokemon.types.map((type, index) => (
-                <Badge key={index}>{type.type.name}</Badge>
+                <Badge key={index} colorScheme={typeColors[type.type.name]}>
+                  {type.type.name}
+                </Badge>
               ))}
             </HStack>
           </Stack>
         </Stack>
       </Stack>
 
-      <Stack spacing="5" p="5" bg="gray.100" borderRadius="xl">
+      <Stack spacing="3" p="5" bg="gray.100" borderRadius="xl">
+        <Text fontSize="md" fontWeight="bold">
+          Stats
+        </Text>
         <Stack>
-          <Text fontSize="xs">hp</Text>
+          <Text fontSize="xs">HP</Text>
           <Progress
             bg="gray.300"
             borderRadius="full"
+            colorScheme={"green"}
             value={pokemon.stats[0].base_stat}
           />
         </Stack>
         <Stack>
-          <Text fontSize="xs">attack</Text>
+          <Text fontSize="xs">Attack</Text>
           <Progress
             bg="gray.300"
             borderRadius="full"
+            colorScheme={"red"}
             value={pokemon.stats[1].base_stat}
           />
         </Stack>
         <Stack>
-          <Text fontSize="xs">defense</Text>
+          <Text fontSize="xs">Defense</Text>
           <Progress
             bg="gray.300"
             borderRadius="full"
+            colorScheme={"blue"}
             value={pokemon.stats[2].base_stat}
           />
         </Stack>

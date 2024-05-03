@@ -15,7 +15,13 @@ export default function Navbar({ text }) {
   return (
     <>
       <Box bg={useColorModeValue("gray.100", "gray.900")} px={6}>
-        <Flex h={24} alignItems={"center"} justifyContent={"space-between"}>
+        <Flex
+          h={24}
+          alignItems={"center"}
+          justifyContent={"space-between"}
+          position="sticky"
+          top="0"
+        >
           <Stack>
             <Image src="/images/pokemon.png" alt="Pokemon" width={200} />
           </Stack>
